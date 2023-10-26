@@ -4,6 +4,7 @@ import { ContactList } from './ContactList/ContactList';
 import { Filter } from './Filter/Filter';
 import { Notificatio } from './Notificatio/Notificatio';
 import { StyledWrapper } from './App.styled';
+import { toast } from 'react-toastify';
 
 export class App extends React.Component {
   state = {
@@ -15,6 +16,26 @@ export class App extends React.Component {
     ],
     filter: '',
   };
+
+  componentDidMount() {
+    toast.success('Component was Mount');
+    const contacts = JSON.parse(window.localStorage.getItem('contacts'));
+    if (contacts?.length) {
+      this.setState({ contacts });
+    }
+  }
+
+  componentDidUpdate(_, prevState) {
+    if (prevState.contacts !== this.state.contacts) {
+      window.localStorage.setItem(
+        'contacts',
+        JSON.stringify(this.state.contacts)
+      );
+    }
+    if (prevState.filter !== this.state.filter) {
+      window.localStorage.setItem('filter', JSON.stringify(this.state.filter));
+    }
+  }
 
   getFilterContacts = () => {
     return this.state.contacts.filter(contact =>
@@ -37,7 +58,7 @@ export class App extends React.Component {
     );
 
     same
-      ? alert(`${newContact.name} is already in contacts.`)
+      ? toast.success(`${newContact.name} is already in contacts.`)
       : this.setState({
           contacts: [newContact, ...this.state.contacts],
         });
